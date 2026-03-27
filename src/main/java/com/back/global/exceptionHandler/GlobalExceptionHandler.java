@@ -7,6 +7,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
 import java.util.Comparator;
 import java.util.NoSuchElementException;
@@ -26,10 +27,19 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseBody
-    public RsData<Void> illegalArgumentException(IllegalArgumentException e){
+    public RsData<Void> handleException(IllegalArgumentException e){
         return new RsData<>(
                 e.getMessage(),
-                "401-1"
+                "400-3"
+        );
+    }
+
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    @ResponseBody
+    public RsData<Void> handleException(HandlerMethodValidationException e){
+        return new RsData<>(
+                e.getMessage(),
+                "400-4"
         );
     }
 
