@@ -24,6 +24,15 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseBody
+    public RsData<Void> illegalArgumentException(IllegalArgumentException e){
+        return new RsData<>(
+                e.getMessage(),
+                "401-1"
+        );
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseBody
     public RsData<Void> handleException(MethodArgumentNotValidException e) {
