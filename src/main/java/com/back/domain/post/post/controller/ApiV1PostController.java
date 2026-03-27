@@ -15,7 +15,15 @@ import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -69,14 +77,15 @@ public class ApiV1PostController {
     @Operation(summary="글 작성")
     public RsData<PostWriteResBody> write(
             @RequestBody @Valid PostWriteReqBody reqBody,
-            @RequestParam @NotBlank @Size(min = 2, max = 30) String username,
-            @RequestParam @NotBlank @Size(min = 2, max = 30) String password) {
+            @RequestParam String apiKey) {
 
-        Member actor = memberService.findByUsername(username).get();
+        Member actor = memberService.findByApiKey(apiKey).orElseThrow(
+                () -> new ServiceException("401-1","유효하지 않은 API Key 입니다.")
+        );
 
-        if(!password.equals(actor.getPassword())){
-            throw new ServiceException("401-1","비밀번호가 일치하지 않습니다!");
-        }
+//        if(!password.equals(actor.getPassword())){
+//            throw new ServiceException("401-1","비밀번호가 일치하지 않습니다!");
+//        }
 
         Post post = postService.write(actor, reqBody.title, reqBody.content);
         long postsCount = postService.count();

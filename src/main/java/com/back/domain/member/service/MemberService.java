@@ -30,4 +30,9 @@ public class MemberService {
         return memberRepository.findByUsername(username);
         // 이경우는 데이터베이스에서 가공해서 가져오는 법
     }
+
+    public Optional<Member> findByApiKey(String apiKey){
+
+        return memberRepository.findByApiKey(apiKey);
+    }
 }
