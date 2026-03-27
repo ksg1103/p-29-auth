@@ -1,5 +1,6 @@
 package com.back.global.exceptionHandler;
 
+import com.back.global.exception.ServiceException;
 import com.back.global.rsData.RsData;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
@@ -7,7 +8,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
 import java.util.Comparator;
 import java.util.NoSuchElementException;
@@ -25,23 +25,12 @@ public class GlobalExceptionHandler {
         );
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
+    @ExceptionHandler(ServiceException.class)
     @ResponseBody
-    public RsData<Void> handleException(IllegalArgumentException e){
-        return new RsData<>(
-                e.getMessage(),
-                "400-3"
-        );
+    public RsData<Void> handleException(ServiceException e){
+        return e.getRsData();
     }
 
-    @ExceptionHandler(HandlerMethodValidationException.class)
-    @ResponseBody
-    public RsData<Void> handleException(HandlerMethodValidationException e){
-        return new RsData<>(
-                e.getMessage(),
-                "400-4"
-        );
-    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseBody
