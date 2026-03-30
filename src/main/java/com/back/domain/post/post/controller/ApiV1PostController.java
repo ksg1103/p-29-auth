@@ -6,6 +6,7 @@ import com.back.domain.post.post.dto.PostDto;
 import com.back.domain.post.post.entity.Post;
 import com.back.domain.post.post.service.PostService;
 import com.back.global.exception.ServiceException;
+import com.back.global.rq.Rq;
 import com.back.global.rsData.RsData;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -35,6 +36,7 @@ public class ApiV1PostController {
 
     private final PostService postService;
     private final MemberService memberService;
+    private final Rq rq;
 
     @GetMapping(produces= MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary="글 다건 조회")
@@ -79,10 +81,8 @@ public class ApiV1PostController {
             @RequestBody @Valid PostWriteReqBody reqBody,
             @RequestHeader("Authorization") String apiKey) {
 
-        apiKey = apiKey.replace("Bearer ", ""); // "Bearer " 접두어 제거
-        Member actor = memberService.findByApiKey(apiKey).orElseThrow(
-                () -> new ServiceException("401-1","유효하지 않은 API Key 입니다.")
-        );
+        Member actor = rq.getActor(); //actor라는 인증된 사용자 정보 가져오기
+
 
 //        if(!password.equals(actor.getPassword())){
 //            throw new ServiceException("401-1","비밀번호가 일치하지 않습니다!");
