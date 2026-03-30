@@ -3,6 +3,7 @@ package com.back.domain.member.controller;
 import com.back.domain.member.dto.MemberDto;
 import com.back.domain.member.entity.Member;
 import com.back.domain.member.service.MemberService;
+import com.back.global.exception.ServiceException;
 import com.back.global.rsData.RsData;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,7 @@ public class ApiV1MemberController {
     ) {
     }
 
-    @PostMapping
+    @PostMapping("/join")
     public RsData<MemberDto> join(@RequestBody @Valid MemberJoinReqBody reqBody) {
 
 
@@ -41,6 +42,37 @@ public class ApiV1MemberController {
                 new MemberJoinResBody(
                         new MemberDto(member)
                 )
+        );
+    }
+
+
+    record MemberLoginReqBody(
+            String username,
+            String password
+    ){}
+
+    record MemberLoginResBody(
+            String apiKey
+    ){}
+    @PostMapping("/login")
+    public RsData<String> login(
+            @RequestBody MemberLoginReqBody reqBody
+    ){
+
+        Member actor = memberService.findByUsername(reqBody.username).orElseThrow(
+                ()->new ServiceException("401-1","존재하지 않는 아이디입니다.")
+        );//여기서 actor는 로그인 요청 들어왔을때, 해당 정보 존재하면, db에서 이 유저 정보
+        //불러와서 처리하는 용도의 유저정보
+
+        if(!actor.getPassword().equals(reqBody.password)){
+            throw new ServiceException("401-2","비밀번호가 일치하지 않습니다");
+        }
+        return new RsData(
+                "%s님 환영합니다.".formatted(actor.getNickname()),
+        "200-1",
+        new MemberLoginResBody(
+                actor.getApiKey()
+            )
         );
     }
 }
