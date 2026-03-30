@@ -6,6 +6,7 @@ import com.back.global.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -42,5 +43,9 @@ public class MemberService {
     public Optional<Member> findByApiKey(String apiKey){
 
         return memberRepository.findByApiKey(apiKey);
+    }
+
+    public List<Member> findAll(){
+        return memberRepository.findAll();
     }
 }

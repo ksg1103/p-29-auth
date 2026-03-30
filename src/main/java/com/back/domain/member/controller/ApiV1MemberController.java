@@ -7,10 +7,13 @@ import com.back.global.exception.ServiceException;
 import com.back.global.rsData.RsData;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/members")
@@ -42,6 +45,20 @@ public class ApiV1MemberController {
                 new MemberJoinResBody(
                         new MemberDto(member)
                 )
+        );
+    }
+
+    @GetMapping
+    public RsData<List<MemberDto>> list(){
+        List<Member> members = memberService.findAll();
+        List<MemberDto> memberDtos = members.stream()
+                .map(MemberDto::new)
+                .toList();
+
+        return new RsData(
+                "회원 목록입니다.",
+                "200-1",
+                memberDtos
         );
     }
 

@@ -21,8 +21,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -77,8 +77,9 @@ public class ApiV1PostController {
     @Operation(summary="글 작성")
     public RsData<PostWriteResBody> write(
             @RequestBody @Valid PostWriteReqBody reqBody,
-            @RequestParam String apiKey) {
+            @RequestHeader("Authorization") String apiKey) {
 
+        apiKey = apiKey.replace("Bearer ", ""); // "Bearer " 접두어 제거
         Member actor = memberService.findByApiKey(apiKey).orElseThrow(
                 () -> new ServiceException("401-1","유효하지 않은 API Key 입니다.")
         );
@@ -122,10 +123,22 @@ public class ApiV1PostController {
     @Transactional
     public RsData<PostModifyResBody> modify(
             @PathVariable int id,
-            @RequestBody @Valid PostModifyReqBody reqBody
+            @RequestBody @Valid PostModifyReqBody reqBody,
+            @RequestHeader("Authorization") String apiKey
     ) {
 
-        Post post = postService.modify(id, reqBody.title, reqBody.content);
+        Member actor = memberService.findByApiKey(apiKey).orElseThrow(
+                () -> new ServiceException("401-1","유효하지 않은 API Key 입니다.")
+        ); //인증
+
+        //권한 체크 들어가야 한다.
+        Post post = postService.findById(id).get();
+
+        if(!actor.equals(post.getAuthor())){
+            throw new ServiceException("403-1","권한이 없습니다.");
+        }
+
+        post = postService.modify(id, reqBody.title, reqBody.content);
 
         return new RsData<>(
                 "%d번 게시물이 수정되었습니다.".formatted(post.getId()),
