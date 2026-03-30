@@ -126,10 +126,7 @@ public class ApiV1PostController {
             @RequestBody @Valid PostModifyReqBody reqBody,
             @RequestHeader("Authorization") String apiKey
     ) {
-        apiKey = apiKey.replace("Bearer ", ""); // "Bearer " 접두어 제거
-        Member actor = memberService.findByApiKey(apiKey).orElseThrow(
-                () -> new ServiceException("401-1","유효하지 않은 API Key 입니다.")
-        ); //인증
+        Member actor = rq.getActor(); //인증된 사용자 정보 가져오기
 
         //권한 체크 들어가야 한다.
         Post post = postService.findById(id).get();
@@ -155,10 +152,7 @@ public class ApiV1PostController {
             @PathVariable int id,
             @RequestHeader("Authorization") String apiKey
     ) {
-        apiKey = apiKey.replace("Bearer ", ""); // "Bearer " 접두어 제거
-        Member actor = memberService.findByApiKey(apiKey).orElseThrow(
-                () -> new ServiceException("401-1","유효하지 않은 API Key 입니다.")
-        ); //인증
+       Member actor = rq.getActor(); //인증된 사용자 정보 가져오기
 
         Post post = postService.findById(id).get();
         if(!actor.equals(post.getAuthor())){
