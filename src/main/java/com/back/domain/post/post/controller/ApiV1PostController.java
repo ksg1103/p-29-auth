@@ -126,7 +126,7 @@ public class ApiV1PostController {
             @RequestBody @Valid PostModifyReqBody reqBody,
             @RequestHeader("Authorization") String apiKey
     ) {
-
+        apiKey = apiKey.replace("Bearer ", ""); // "Bearer " 접두어 제거
         Member actor = memberService.findByApiKey(apiKey).orElseThrow(
                 () -> new ServiceException("401-1","유효하지 않은 API Key 입니다.")
         ); //인증
