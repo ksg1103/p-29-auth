@@ -31,4 +31,16 @@ public class Comment extends BaseEntity {
     public void update(String content) {
         this.content = content;
     }
+
+    public void checkModify(Member member) {
+        if (!this.author.getId().equals(member.getId())) {
+            throw new IllegalStateException("댓글 수정 권한이 없습니다.");
+        }
+    }
+
+    public void checkDelete(Member member) {
+        if (!this.author.getId().equals(member.getId())) {
+            throw new IllegalStateException("댓글 삭제 권한이 없습니다.");
+        }
+    }
 }
