@@ -4,6 +4,7 @@ import com.back.domain.member.dto.MemberDto;
 import com.back.domain.member.entity.Member;
 import com.back.domain.member.service.MemberService;
 import com.back.global.exception.ServiceException;
+import com.back.global.rq.Rq;
 import com.back.global.rsData.RsData;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ApiV1MemberController {
     private final MemberService memberService;
+    private final Rq rq;
 
     record MemberJoinReqBody(
             String username,
@@ -79,7 +81,7 @@ public class ApiV1MemberController {
         Member actor = memberService.findByUsername(reqBody.username).orElseThrow(
                 ()->new ServiceException("401-1","존재하지 않는 아이디입니다.")
         );//여기서 actor는 로그인 요청 들어왔을때, 해당 정보 존재하면, db에서 이 유저 정보
-        //불러와서 처리하는 용도의 유저정보
+        //불러와서 처리하는 용도의 유저정보 한마디로 로그인한 유저 정보라고 생각하면 됨
 
         if(!actor.getPassword().equals(reqBody.password)){
             throw new ServiceException("401-2","비밀번호가 일치하지 않습니다");
@@ -91,6 +93,16 @@ public class ApiV1MemberController {
                 actor.getApiKey()
             )
         );
+    }
+
+
+
+    @GetMapping("/me")
+    public MemberDto me() {
+
+        Member actor = rq.getActor();
+        return new MemberDto(actor);
+
     }
 }
 
