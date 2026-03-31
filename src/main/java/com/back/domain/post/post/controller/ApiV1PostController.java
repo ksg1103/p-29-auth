@@ -123,7 +123,7 @@ public class ApiV1PostController {
     public RsData<PostModifyResBody> modify(
             @PathVariable int id,
             @RequestBody @Valid PostModifyReqBody reqBody
-            ,@RequestHeader("Authorization") String apiKey
+//            ,@RequestHeader("Authorization") String apiKeyCookie
     ) {
         Member actor = rq.getActor(); //인증된 사용자 정보 가져오기
 
