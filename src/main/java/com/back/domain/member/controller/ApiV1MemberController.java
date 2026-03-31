@@ -6,6 +6,8 @@ import com.back.domain.member.service.MemberService;
 import com.back.global.exception.ServiceException;
 import com.back.global.rq.Rq;
 import com.back.global.rsData.RsData;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +24,8 @@ import java.util.List;
 public class ApiV1MemberController {
     private final MemberService memberService;
     private final Rq rq;
+    private final HttpServletResponse response;
+
 
     record MemberJoinReqBody(
             String username,
@@ -86,6 +90,11 @@ public class ApiV1MemberController {
         if(!actor.getPassword().equals(reqBody.password)){
             throw new ServiceException("401-2","비밀번호가 일치하지 않습니다");
         }
+
+        response.addCookie(
+                new Cookie("apiKey", actor.getApiKey())
+        );
+
         return new RsData(
                 "%s님 환영합니다.".formatted(actor.getNickname()),
         "200-1",
