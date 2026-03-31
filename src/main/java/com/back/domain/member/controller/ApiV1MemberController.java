@@ -8,6 +8,7 @@ import com.back.global.rq.Rq;
 import com.back.global.rsData.RsData;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -100,7 +101,17 @@ public class ApiV1MemberController {
         );
     }
 
+    @DeleteMapping("/logout")
+    public RsData<Void> logout(){
 
+        rq.deleteCookie("apiKey");
+
+        return new RsData<>(
+                "로그아웃 되었습니다.",
+                "200-1"
+        );
+
+    }
 
     @GetMapping("/me")
     public MemberDto me() {

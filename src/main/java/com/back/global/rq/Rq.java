@@ -59,4 +59,14 @@ public class Rq {
         );
         return actor;
     }
+
+    public void deleteCookie(String name) {
+        Cookie cookie = new Cookie(name, "");
+        cookie.setPath("/"); // 쿠키가 모든 경로에서 유효하도록 설정
+        cookie.setHttpOnly(true); // JavaScript에서 쿠키에 접근하지 못하도록 설정 (보안 강화)
+        cookie.setDomain("localhost"); // 쿠키가 유효한 도메인 설정 (필요에 따라 변경)
+        cookie.setMaxAge(0); // 쿠키의 수명을 0으로 설정하여 즉시 삭제
+
+        response.addCookie(cookie);
+    }
 }

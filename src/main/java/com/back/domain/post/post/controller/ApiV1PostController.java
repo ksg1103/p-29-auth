@@ -77,8 +77,7 @@ public class ApiV1PostController {
     @PostMapping
     @Operation(summary="글 작성")
     public RsData<PostWriteResBody> write(
-            @RequestBody @Valid PostWriteReqBody reqBody,
-            @RequestHeader("Authorization") String apiKey) {
+            @RequestBody @Valid PostWriteReqBody reqBody) {
 
         Member actor = rq.getActor(); //actor라는 인증된 사용자 정보 가져오기
 
