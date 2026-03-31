@@ -19,9 +19,12 @@ public class Rq {
     private final HttpServletResponse response;
 
     public void addCokie(String name, String value){
-        response.addCookie(
-                new Cookie(name, value)
-        );
+        Cookie cookie = new Cookie(name, value);
+        cookie.setPath("/"); // 쿠키가 모든 경로에서 유효하도록 설정
+        cookie.setHttpOnly(true); // JavaScript에서 쿠키에 접근하지 못하도록 설정 (보안 강화)
+        cookie.setDomain("localhost"); // 쿠키가 유효한 도메인 설정 (필요에 따라 변경)
+
+        response.addCookie(cookie);
     }
     public Member getActor() {
 
