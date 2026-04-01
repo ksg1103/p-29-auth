@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -86,8 +85,8 @@ public class ApiV1PostController {
 //        if(!password.equals(actor.getPassword())){
 //            throw new ServiceException("401-1","비밀번호가 일치하지 않습니다!");
 //        }
-
-        Post post = postService.write(actor, reqBody.title, reqBody.content);
+        Member author = memberService.findById(actor.getId()).get();
+        Post post = postService.write(author, reqBody.title, reqBody.content);
 
         return new RsData<>(
                 "%d번 게시물이 생성되었습니다.".formatted(post.getId()),
@@ -144,8 +143,8 @@ public class ApiV1PostController {
     @DeleteMapping("/{id}")
     @Operation(summary="글 삭제")
     public RsData<Void> delete(
-            @PathVariable int id,
-            @RequestHeader("Authorization") String apiKey
+            @PathVariable int id
+
     ) {
        Member actor = rq.getActor(); //인증된 사용자 정보 가져오기
 
