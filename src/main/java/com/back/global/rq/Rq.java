@@ -10,63 +10,87 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 @Component
-//@RequestScope // 각 HTTP 요청마다 새로운 Rq 객체가 생성되고, 요청이 끝나면 해당 객체는 소멸됩니다.
 @RequiredArgsConstructor
 public class Rq {
 
     private final HttpServletRequest request;
-    private final MemberService memberService;
     private final HttpServletResponse response;
+    private final MemberService memberService;
 
-    public void addCokie(String name, String value){
-        Cookie cookie = new Cookie(name, value);
-        cookie.setPath("/"); // 쿠키가 모든 경로에서 유효하도록 설정
-        cookie.setHttpOnly(true); // JavaScript에서 쿠키에 접근하지 못하도록 설정 (보안 강화)
-        cookie.setDomain("localhost"); // 쿠키가 유효한 도메인 설정 (필요에 따라 변경)
-
-        response.addCookie(cookie);
-    }
     public Member getActor() {
 
-        String authorizationHeader = request.getHeader("Authorization");
-        String apiKey = null;
-        //헤더방식 vs 쿠키방식
-        if(authorizationHeader != null) {
-//            throw new ServiceException("401-2","인증 정보가 헤더에 존재하지 않습니다.");
+        String authorizationHeader = getHeader("Authorization", "");
 
-            if(!authorizationHeader.startsWith("Bearer ")) {
-                throw new ServiceException("401-3","유효하지 않은 인증 정보입니다.");
+        String apiKey;
+        String accessToken;
+
+        if (authorizationHeader != null) {
+            // 헤더 방식
+            if (!authorizationHeader.startsWith("Bearer ")) {
+                throw new ServiceException("401-2", "잘못된 형식의 인증데이터입니다.");
             }
 
-            apiKey = authorizationHeader.replace("Bearer ", ""); // "Bearer " 접두어 제거
-        } else{
-            apiKey = request.getCookies() == null ? ""
-                    : Arrays.stream(request.getCookies())
-                    .filter(cookie -> cookie.getName().equals("apiKey"))
-                    .map(Cookie::getValue)
-                    .findFirst()
-                    .orElseThrow(()-> new ServiceException("401-4","인증 정보가 쿠키에 존재하지 않습니다."));
+            String[] headerAuthorizationBits = authorizationHeader.split(" ", 3);            apiKey = authorizationHeader.replace("Bearer ", "");
+
+            apiKey = headerAuthorizationBits[1];
+            accessToken = headerAuthorizationBits.length == 3 ? headerAuthorizationBits[2] : "";
+        } else {
+            apiKey = getCookieValue("apiKey", "");
+            accessToken = getCookieValue("accessToken", "");
         }
 
-        if(apiKey.isBlank()){
-            throw new ServiceException("401-5","인증 정보가 존재하지 않습니다.");
+        if(apiKey.isBlank()) {
+            throw new ServiceException("401-3", "인증 정보가 존재하지 않습니다.");
         }
 
-        Member actor = memberService.findByApiKey(apiKey).orElseThrow(
-                () -> new ServiceException("401-1","유효하지 않은 API Key 입니다.")
+        return memberService.findByApiKey(apiKey).orElseThrow(
+                () -> new ServiceException("401-1", "유효하지 않은 API 키입니다.")
         );
-        return actor;
+    }
+
+    private String getHeader(String name, String defaultValue) {
+        return Optional
+                .ofNullable(request.getHeader(name))
+                .filter(headerValue -> !headerValue.isBlank())
+                .orElse(defaultValue);
+    }
+
+    private String getCookieValue(String name, String defaultValue) {
+        return Optional
+                .ofNullable(request.getCookies())
+                .flatMap(
+                        cookies ->
+                                Arrays.stream(cookies)
+                                        .filter(cookie -> cookie.getName().equals(name))
+                                        .map(Cookie::getValue)
+                                        .filter(value -> !value.isBlank())
+                                        .findFirst()
+                )
+                .orElse(defaultValue);
     }
 
     public void deleteCookie(String name) {
         Cookie cookie = new Cookie(name, "");
-        cookie.setPath("/"); // 쿠키가 모든 경로에서 유효하도록 설정
-        cookie.setHttpOnly(true); // JavaScript에서 쿠키에 접근하지 못하도록 설정 (보안 강화)
-        cookie.setDomain("localhost"); // 쿠키가 유효한 도메인 설정 (필요에 따라 변경)
-        cookie.setMaxAge(0); // 쿠키의 수명을 0으로 설정하여 즉시 삭제
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setDomain("localhost");
+        cookie.setMaxAge(0);
 
         response.addCookie(cookie);
+    }
+
+    public void addCookie(String name, String value) {
+
+        Cookie cookie = new Cookie(name, value);
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setDomain("localhost");
+
+        response.addCookie(
+                cookie
+        );
     }
 }
