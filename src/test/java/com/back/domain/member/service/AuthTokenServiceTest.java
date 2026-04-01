@@ -86,6 +86,8 @@ public class AuthTokenServiceTest {
 
         assertThat(jwt).isNotBlank();
 
+        boolean rst = Ut.jwt.isValid(jwt, secretPattern);
+        assertThat(rst).isTrue();
         System.out.println("jwt = " + jwt);
     }
 
