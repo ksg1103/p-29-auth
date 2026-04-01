@@ -99,7 +99,7 @@ public class ApiV1MemberControllerTest {
                 .andExpect(handler().methodName("join"))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.resultCode").value("409-1"))
-                .andExpect(jsonPath("$.msg").value("이미 사용중인 아이디 입니다"));
+                .andExpect(jsonPath("$.msg").value("이미 사용중인 아이디입니다."));
     }
 
     @Test

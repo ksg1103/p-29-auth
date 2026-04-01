@@ -31,7 +31,7 @@ public class Rq {
         if (!authorizationHeader.isBlank()) {
             // 헤더 방식
             if (!authorizationHeader.startsWith("Bearer ")) {
-                throw new ServiceException("401-2", "잘못된 형식의 인증데이터입니다.");
+                throw new ServiceException("401-1", "잘못된 형식의 인증데이터입니다.");
             }
 
             String[] headerAuthorizationBits = authorizationHeader.split(" ", 3);            apiKey = authorizationHeader.replace("Bearer ", "");
@@ -46,7 +46,7 @@ public class Rq {
         Member member = null;
 
         if (apiKey.isBlank()) {
-            throw new ServiceException("401-1", "apiKey가 존재하지 않습니다.");
+            throw new ServiceException("401-2", "apiKey가 존재하지 않습니다.");
         }
 
         if (!accessToken.isBlank()) {
