@@ -12,7 +12,7 @@ import java.util.Date;
 import java.util.Map;
 
 public class Ut {
-    public static class jwt {
+    public static class jwt { // jwt 생성하는 함수
         public static String toString(String secret, long expireSeconds, Map<String, Object> body) {
             ClaimsBuilder claimsBuilder = Jwts.claims();
 
@@ -37,7 +37,7 @@ public class Ut {
             return jwt;
         }
 
-        public static boolean isValid(String jwt, String secret){
+        public static boolean isValid(String jwt, String secret){ // jwt 검증하는 함수
             byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
             SecretKey secretKey = Keys.hmacShaKeyFor(keyBytes);
             try{
