@@ -91,10 +91,10 @@ public class ApiV1MemberController {
             throw new ServiceException("401-2","비밀번호가 일치하지 않습니다");
         }
 
-        rq.addCokie("apiKey", actor.getApiKey());
+        rq.addCookie("apiKey", actor.getApiKey());
 
         String accessToken = memberService.genAccessToken(actor);
-        rq.addCokie("accessToken",accessToken);
+        rq.addCookie("accessToken",accessToken);
 
         return new RsData(
                 "%s님 환영합니다.".formatted(actor.getNickname()),
