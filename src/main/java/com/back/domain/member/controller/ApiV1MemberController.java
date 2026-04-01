@@ -74,7 +74,8 @@ public class ApiV1MemberController {
     ){}
 
     record MemberLoginResBody(
-            String apiKey
+            String apiKey,
+            String accessToken
     ){}
     @PostMapping("/login")
     public RsData<String> login(
@@ -92,11 +93,15 @@ public class ApiV1MemberController {
 
         rq.addCokie("apiKey", actor.getApiKey());
 
+        String accessToken = memberService.genAccessToken(actor);
+        rq.addCokie("accessToken",accessToken);
+
         return new RsData(
                 "%s님 환영합니다.".formatted(actor.getNickname()),
         "200-1",
         new MemberLoginResBody(
-                actor.getApiKey()
+                actor.getApiKey(),
+                accessToken
             )
         );
     }

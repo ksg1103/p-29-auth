@@ -15,36 +15,37 @@ import java.util.UUID;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final AuthTokenService authTokenService;
 
-    public Member join(String username, String password, String nickname, String apiKey){
+    public Member join(String username, String password, String nickname, String apiKey) {
         findByUsername(username).
                 ifPresent(
-                        m->{
-                            throw new ServiceException("409-1","이미 사용중인 아이디 입니다");
+                        m -> {
+                            throw new ServiceException("409-1", "이미 사용중인 아이디 입니다");
                         }
                 );
 
-        Member member = new Member(username,password,nickname, apiKey);
+        Member member = new Member(username, password, nickname, apiKey);
         return memberRepository.save(member);
     }
 
-    public Member join(String username, String password, String nickname){
+    public Member join(String username, String password, String nickname) {
         findByUsername(username).
                 ifPresent(
-                        m->{
-                            throw new ServiceException("409-1","이미 사용중인 아이디 입니다");
+                        m -> {
+                            throw new ServiceException("409-1", "이미 사용중인 아이디 입니다");
                         }
                 );
 
-        Member member = new Member(username,password,nickname, UUID.randomUUID().toString());
+        Member member = new Member(username, password, nickname, UUID.randomUUID().toString());
         return memberRepository.save(member);
     }
 
-    public long count(){
+    public long count() {
         return memberRepository.count();
     }
 
-    public Optional<Member> findByUsername(String username){
+    public Optional<Member> findByUsername(String username) {
 //        return memberRepository.findAll().stream()
 //                .filter(m-> m.getUsername().equals(username))
 //                .findFirst(); //이방법도 있긴 한데, 대용량의 정보가 넘어오면 과부하 걸림
@@ -53,12 +54,16 @@ public class MemberService {
         // 이경우는 데이터베이스에서 가공해서 가져오는 법
     }
 
-    public Optional<Member> findByApiKey(String apiKey){
+    public Optional<Member> findByApiKey(String apiKey) {
 
         return memberRepository.findByApiKey(apiKey);
     }
 
-    public List<Member> findAll(){
+    public List<Member> findAll() {
         return memberRepository.findAll();
+    }
+
+    public String genAccessToken(Member member) {
+        return authTokenService.genAccessToken(member);
     }
 }
