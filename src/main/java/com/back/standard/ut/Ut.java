@@ -53,5 +53,17 @@ public class Ut {
             }
             return true;
         }
+
+        public static Map<String,Object> payload(String jwt, String secret){
+            byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
+            SecretKey secretKey = Keys.hmacShaKeyFor(keyBytes);
+
+            return (Map<String, Object>) Jwts
+                    .parser()
+                    .verifyWith(secretKey)
+                    .build()
+                    .parse(jwt)
+                    .getPayload();
+        }
     }
 }
