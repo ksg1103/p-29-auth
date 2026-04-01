@@ -6,16 +6,10 @@ import com.back.domain.member.service.MemberService;
 import com.back.global.exception.ServiceException;
 import com.back.global.rq.Rq;
 import com.back.global.rsData.RsData;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/members")
@@ -23,8 +17,7 @@ import java.util.List;
 public class ApiV1MemberController {
     private final MemberService memberService;
     private final Rq rq;
-
-
+    private final HttpServletResponse response;
 
     record MemberJoinReqBody(
             String username,
@@ -41,7 +34,6 @@ public class ApiV1MemberController {
     @PostMapping("/join")
     public RsData<MemberDto> join(@RequestBody @Valid MemberJoinReqBody reqBody) {
 
-
         Member member = memberService.join(reqBody.username, reqBody.password, reqBody.nickname);
 
         return new RsData(
@@ -53,69 +45,53 @@ public class ApiV1MemberController {
         );
     }
 
-    @GetMapping
-    public RsData<List<MemberDto>> list(){
-        List<Member> members = memberService.findAll();
-        List<MemberDto> memberDtos = members.stream()
-                .map(MemberDto::new)
-                .toList();
-
-        return new RsData(
-                "회원 목록입니다.",
-                "200-1",
-                memberDtos
-        );
-    }
-
-
     record MemberLoginReqBody(
             String username,
             String password
-    ){}
+    ) {
+    }
 
     record MemberLoginResBody(
             String apiKey,
             String accessToken
-    ){}
+    ) {
+    }
+
     @PostMapping("/login")
-    public RsData<String> login(
-            @RequestBody MemberLoginReqBody reqBody
-    ){
+    public RsData<MemberLoginResBody> login(@RequestBody @Valid MemberLoginReqBody reqBody) {
 
         Member actor = memberService.findByUsername(reqBody.username).orElseThrow(
-                ()->new ServiceException("401-1","존재하지 않는 아이디입니다.")
-        );//여기서 actor는 로그인 요청 들어왔을때, 해당 정보 존재하면, db에서 이 유저 정보
-        //불러와서 처리하는 용도의 유저정보 한마디로 로그인한 유저 정보라고 생각하면 됨
+                () -> new ServiceException("401-1", "존재하지 않는 아이디입니다.")
+        );
 
         if(!actor.getPassword().equals(reqBody.password)){
-            throw new ServiceException("401-2","비밀번호가 일치하지 않습니다");
+            throw new ServiceException("401-2", "비밀번호가 일치하지 않습니다.");
         }
 
         rq.addCookie("apiKey", actor.getApiKey());
 
         String accessToken = memberService.genAccessToken(actor);
-        rq.addCookie("accessToken",accessToken);
+        rq.addCookie("accessToken", accessToken);
 
         return new RsData(
-                "%s님 환영합니다.".formatted(actor.getNickname()),
-        "200-1",
-        new MemberLoginResBody(
-                actor.getApiKey(),
-                accessToken
-            )
+                "%s님 환영합니다.".formatted(actor.getName()),
+                "200-1",
+                new MemberLoginResBody(
+                        actor.getApiKey(),
+                        accessToken
+                )
         );
     }
 
     @DeleteMapping("/logout")
-    public RsData<Void> logout(){
+    public RsData<Void> logout() {
 
         rq.deleteCookie("apiKey");
 
-        return new RsData<>(
+        return new RsData(
                 "로그아웃 되었습니다.",
                 "200-1"
         );
-
     }
 
     @GetMapping("/me")
@@ -126,5 +102,3 @@ public class ApiV1MemberController {
 
     }
 }
-
-
