@@ -43,7 +43,7 @@ public class AuthTokenServiceTest {
        String jwt = Ut.jwt.toString(secretPattern, expireSeconds, payload);
 
         //jwt 확인(파싱)
-        Map<String, Object> parsedPayload = Ut.jwt.payload(jwt, secretPattern);
+        Map<String, Object> parsedPayload = Ut.jwt.payloadOrNull(jwt, secretPattern);
 
         assertThat(parsedPayload)
                 .containsAllEntriesOf(payload);

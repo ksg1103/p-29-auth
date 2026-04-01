@@ -11,7 +11,7 @@ class AuthTokenService {
     private String secretKey= "abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890";
     private long expireTime = 1000L * 60 * 60 * 24 * 365;
 
-    public String genAccessToken(Member member){
+    String genAccessToken(Member member){
         return Ut.jwt.toString(
             secretKey,
             expireTime,
@@ -19,5 +19,9 @@ class AuthTokenService {
                 "id", member.getId(),
                 "name", member.getName())
         );
+    }
+
+    Map<String,Object> payloadOrNull(String jwt,String secretKey){
+        return Ut.jwt.payloadOrNull(jwt, secretKey);
     }
 }
