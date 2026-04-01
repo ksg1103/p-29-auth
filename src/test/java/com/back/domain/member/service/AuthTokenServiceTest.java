@@ -38,7 +38,7 @@ public class AuthTokenServiceTest {
         // 토큰 만료기간: 1년
         long expireMillis = 1000L * 60 * 60 * 24 * 365;
 
-
+        //jwt 생성
         Map<String, Object> payload = Map.of("name", "Paul", "age", 23);
        String jwt = Ut.jwt.toString(secretPattern, expireSeconds, payload);
 

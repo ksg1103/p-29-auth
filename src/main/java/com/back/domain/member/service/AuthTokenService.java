@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 
 @Service
-public class AuthTokenService {
+class AuthTokenService {
     private String secretKey= "abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890";
     private long expireTime = 1000L * 60 * 60 * 24 * 365;
 
