@@ -86,6 +86,7 @@ public class ApiV1MemberController {
     @DeleteMapping("/logout")
     public RsData<Void> logout() {
 
+        rq.getActor();
         rq.deleteCookie("apiKey");
 
         return new RsData(
