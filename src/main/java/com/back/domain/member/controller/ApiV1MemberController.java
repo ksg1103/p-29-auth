@@ -66,7 +66,6 @@ public class ApiV1MemberController {
 
         memberService.checkPassword(reqBody.password, actor.getPassword());
 
-
         rq.addCookie("apiKey", actor.getApiKey());
 
         String accessToken = memberService.genAccessToken(actor);
