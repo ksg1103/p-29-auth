@@ -3,6 +3,7 @@ package com.back.domain.member.controller;
 import com.back.domain.member.dto.MemberWithUsernameDto;
 import com.back.domain.member.entity.Member;
 import com.back.domain.member.service.MemberService;
+import com.back.global.exception.ServiceException;
 import com.back.global.rq.Rq;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
