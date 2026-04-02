@@ -3,10 +3,12 @@ package com.back.domain.member.controller;
 
 import com.back.domain.member.entity.Member;
 import com.back.domain.member.repository.MemberRepository;
+import com.back.standard.ut.Ut;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
@@ -35,6 +37,9 @@ public class ApiV1MemberControllerTest {
 
     @Autowired
     private MemberRepository memberRepository;
+
+    @Value("${custom.jwt.secretPattern}")
+    private String secretPattern;
 
     @Test
     @DisplayName("회원 가입")
@@ -161,9 +166,12 @@ public class ApiV1MemberControllerTest {
     @Test
     @DisplayName("로그아웃")
     void t4() throws Exception {
+        Member actor = memberRepository.findByUsername("user1").get();
+        String actorApiKey = actor.getApiKey();
         ResultActions resultActions = mvc
                 .perform(
                         delete("/api/v1/members/logout")
+                                .cookie(new Cookie("apiKey", actorApiKey))
                 )
                 .andDo(print());
 
@@ -223,5 +231,19 @@ public class ApiV1MemberControllerTest {
                 .andExpect(handler().handlerType(ApiV1MemberController.class))
                 .andExpect(handler().methodName("me"))
                 .andExpect(status().isOk());
+
+        resultActions
+                .andExpect((result) -> {
+                    Cookie accessTokenCookie = result.getResponse().getCookie("accessToken");
+                    assertThat(accessTokenCookie).isNotNull();
+
+                    assertThat(accessTokenCookie.getPath()).isEqualTo("/");
+                    assertThat(accessTokenCookie.getDomain()).isEqualTo("localhost");
+                    assertThat(accessTokenCookie.isHttpOnly()).isEqualTo(true);
+
+                    String newAccessToken = accessTokenCookie.getValue();
+                    assertThat(newAccessToken).isNotEqualTo(accessTokenCookie);
+                    assertThat(Ut.jwt.isValid(newAccessToken, secretPattern)).isTrue();
+                });
     }
 }
