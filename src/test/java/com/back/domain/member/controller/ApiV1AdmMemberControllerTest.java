@@ -2,6 +2,7 @@ package com.back.domain.member.controller;
 
 import com.back.domain.member.entity.Member;
 import com.back.domain.member.repository.MemberRepository;
+import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 import static org.hamcrest.Matchers.containsInRelativeOrder;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.handler;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 @SpringBootTest
@@ -38,8 +41,8 @@ public class ApiV1AdmMemberControllerTest {
         ResultActions resultActions = mvc
                 .perform(
                         get("/api/v1/adm/members")
-                                .header(
-                                        "Authorization", "Bearer %s".formatted(actor.getApiKey())
+                                .cookie(
+                                        new Cookie("apiKey", actor.getApiKey())
                                 )
                 )
                 .andDo(print());
