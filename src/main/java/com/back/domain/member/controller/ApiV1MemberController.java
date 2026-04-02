@@ -96,9 +96,12 @@ public class ApiV1MemberController {
 
     @GetMapping("/me")
     public MemberDto me() {
-
+        //get actor는 이제 jwt가 있으면, db조회 하지 않는다. -> 내가 정한 정보들만 들어있다. -> id, username, nickname
         Member actor = rq.getActor();
-        return new MemberDto(actor);
+
+        //actor의 id는 있기에, 이걸로 실제 db를 조회해서, 최신의 회원정보를 가져온다.
+        Member me = memberService.findById(actor.getId()).get();
+        return new MemberDto(me);
 
     }
 }

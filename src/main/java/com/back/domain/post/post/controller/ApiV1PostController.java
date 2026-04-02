@@ -85,8 +85,8 @@ public class ApiV1PostController {
 //        if(!password.equals(actor.getPassword())){
 //            throw new ServiceException("401-1","비밀번호가 일치하지 않습니다!");
 //        }
-        Member author = memberService.findById(actor.getId()).get();
-        Post post = postService.write(author, reqBody.title, reqBody.content);
+        //Member author = memberService.findById(actor.getId()).get();
+        Post post = postService.write(actor, reqBody.title, reqBody.content);
 
         return new RsData<>(
                 "%d번 게시물이 생성되었습니다.".formatted(post.getId()),
