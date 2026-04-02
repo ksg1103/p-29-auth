@@ -1,6 +1,6 @@
 package com.back.domain.member.controller;
 
-
+import com.back.domain.member.entity.Member;
 import com.back.domain.member.repository.MemberRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,9 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 import static org.hamcrest.Matchers.containsInRelativeOrder;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.handler;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
@@ -68,5 +68,28 @@ public class ApiV1AdmMemberControllerTest {
 //                    .andExpect(jsonPath("$[%d].title".formatted(i)).value(post.getTitle()))
 //                    .andExpect(jsonPath("$[%d].content".formatted(i)).value(post.getContent()));
 //        }
+    }
+
+    @Test
+    @DisplayName("회원 다건 조회, 권한이 없는 경우")
+    void t2() throws Exception {
+
+        Member actor = memberRepository.findByUsername("user1").get();
+
+        ResultActions resultActions = mvc
+                .perform(
+                        get("/api/v1/adm/members")
+                                .header(
+                                        "Authorization", "Bearer %s".formatted(actor.getApiKey())
+                                )
+                )
+                .andDo(print());
+
+        resultActions
+                .andExpect(handler().handlerType(ApiV1AdmMemberController.class))
+                .andExpect(handler().methodName("list"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.resultCode").value("403-1"))
+                .andExpect(jsonPath("$.msg").value("권한이 없습니다."));
     }
 }
